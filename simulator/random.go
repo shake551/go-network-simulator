@@ -6,8 +6,9 @@ import (
 	"time"
 )
 
-func ExpRand(x float64) float64 {
+func RandomMillisecond(x float64) int {
 	rand.Seed(time.Now().UnixNano())
 
-	return math.Log(1-rand.Float64()) * -1 / x
+	expRandom := math.Log(1-rand.Float64()) * -1 / x
+	return int(expRandom * 1000)
 }
