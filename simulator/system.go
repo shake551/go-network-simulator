@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"sort"
 	"time"
 )
 
@@ -33,4 +34,28 @@ func (s System) Init() {
 		Type: "finish",
 		Time: s.FinishTime,
 	})
+}
+
+func (s System) AppendEvent(eventType string) {
+	nowTime := time.UnixMicro(s.NowTime)
+	durationMillisecond := time.Duration(s.GetPacketTime())
+
+	eventTime := nowTime.Add(time.Millisecond * durationMillisecond)
+
+	*s.EventTable = append(*s.EventTable, Event{
+		Type: eventType,
+		Time: eventTime.UnixMicro(),
+	})
+}
+
+func (s System) SortEventTableByTime() {
+	sort.Slice(s.EventTable, func(i, j int) bool { return (*s.EventTable)[i].Time < (*s.EventTable)[j].Time })
+}
+
+func (s System) GetPacketTime() int {
+	return RandomMillisecond(s.PacketRate)
+}
+
+func (s System) GetServiceTime() int {
+	return RandomMillisecond(s.ServiceRate)
 }

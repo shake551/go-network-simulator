@@ -42,3 +42,24 @@ func TestInit(t *testing.T) {
 		t.Errorf("the length of event table should be 2, but got %d", len(*s.EventTable))
 	}
 }
+
+func TestAppendEvent(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+
+	s.Init()
+
+	s.AppendEvent("start")
+
+	targetEvent := (*s.EventTable)[len(*s.EventTable)-1]
+
+	if targetEvent.Type != "start" {
+		t.Errorf("the event type shold be start, but got %s", targetEvent.Type)
+	}
+
+	if targetEvent.Time <= s.NowTime {
+		t.Errorf("the event time should be bigger than nowTime")
+	}
+}
