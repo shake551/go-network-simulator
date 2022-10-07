@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"github.com/shake551/go-network-simulator/utils"
 	"sort"
 	"time"
 )
@@ -14,6 +15,7 @@ type System struct {
 	NowTime        int64
 	EventTable     *[]Event
 	EventQueue     *EventQueue
+	IsProcess      *bool
 }
 
 func NewSystem(packetRate float64, serviceRate float64, systemCapacity int64, startTime time.Time, finishTime time.Time, maxSize int) *System {
@@ -26,6 +28,7 @@ func NewSystem(packetRate float64, serviceRate float64, systemCapacity int64, st
 		NowTime:        startTime.UnixMicro(),
 		EventTable:     &[]Event{{Type: "start", Time: startTime.UnixMicro()}},
 		EventQueue:     &EventQueue{MaxSize: maxSize},
+		IsProcess:      utils.Bool(false),
 	}
 }
 
@@ -58,4 +61,12 @@ func (s System) GetPacketTime() int {
 
 func (s System) GetServiceTime() int {
 	return RandomMillisecond(s.ServiceRate)
+}
+
+func (s System) MakeProcess() {
+	*s.IsProcess = true
+}
+
+func (s System) UnProcess() {
+	*s.IsProcess = false
 }
