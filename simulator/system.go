@@ -49,7 +49,7 @@ func (s System) AppendEvent(eventType string) {
 }
 
 func (s System) SortEventTableByTime() {
-	sort.Slice(s.EventTable, func(i, j int) bool { return (*s.EventTable)[i].Time < (*s.EventTable)[j].Time })
+	sort.Slice(*s.EventTable, func(i, j int) bool { return (*s.EventTable)[i].Time < (*s.EventTable)[j].Time })
 }
 
 func (s System) GetPacketTime() int {
