@@ -63,3 +63,24 @@ func TestAppendEvent(t *testing.T) {
 		t.Errorf("the event time should be bigger than nowTime")
 	}
 }
+
+func TestSortEventTable(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+
+	s.Init()
+	s.AppendEvent("start")
+	s.SortEventTableByTime()
+
+	finishEvent := (*s.EventTable)[len(*s.EventTable)-1]
+
+	if finishEvent.Type != "finish" {
+		t.Errorf("the event type should be finish, but got %s", finishEvent.Type)
+	}
+
+	if finishEvent.Time != finishTime.UnixMicro() {
+		t.Errorf("the finish time should be %d, but got %d", finishEvent.Time, finishTime.UnixMicro())
+	}
+}
