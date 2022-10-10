@@ -39,8 +39,9 @@ func (s System) Init() {
 		Time: s.FinishTime,
 	})
 
-	s.AppendEvent("finish")
 	s.AppendEvent("start")
+
+	s.MakeProcess()
 }
 
 func (s System) AppendEvent(eventType string) {
@@ -72,6 +73,19 @@ func (s System) MoveToNextEvent() error {
 	return nil
 }
 
+func (s System) EventStart() {
+	s.AppendEvent("start")
+
+	if !*s.IsProcess {
+		s.MakeProcess()
+		return
+	}
+
+	if !(*s.EventQueue).IsFull() {
+		(*s.EventQueue).Enqueue(*s.NowEvent)
+	}
+}
+
 func (s System) GetPacketTime() int {
 	return RandomMillisecond(s.PacketRate)
 }
@@ -82,6 +96,7 @@ func (s System) GetServiceTime() int {
 
 func (s System) MakeProcess() {
 	*s.IsProcess = true
+	s.AppendEvent("finish")
 }
 
 func (s System) UnProcess() {
