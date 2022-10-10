@@ -105,3 +105,31 @@ func TestIsProcess(t *testing.T) {
 		t.Errorf("the isProcess should be false, but got true")
 	}
 }
+
+func TestMoveToNextEvent(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	s.Init()
+
+	err := s.MoveToNextEvent()
+	if err != nil {
+		t.Errorf("cannot move to next event")
+	}
+
+	if (*s.NowEvent).Time == nowTime.UnixMicro() {
+		t.Errorf("nowEventTime should be more than %d, but got %d", (*s.NowEvent).Time, nowTime.UnixMicro())
+	}
+
+	if (*s.NowEvent).Type == (*s.EventTable)[0].Type {
+		t.Errorf("the NowEvent type should be different from next event type, but got %s = %s", (*s.NowEvent).Type, (*s.EventTable)[0].Type)
+	}
+
+	*s.EventTable = []simulator.Event{}
+
+	err = s.MoveToNextEvent()
+	if err == nil {
+		t.Errorf("the function MoveToNextEvent should return error, but got nil")
+	}
+}
