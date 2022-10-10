@@ -38,8 +38,8 @@ func TestInit(t *testing.T) {
 		t.Errorf("the nowEventTime should be %d, but got %d", nowTime.UnixMicro(), s.NowEvent.Time)
 	}
 
-	if len(*s.EventTable) != 1 {
-		t.Errorf("the length of event table should be 1, but got %d", len(*s.EventTable))
+	if len(*s.EventTable) != 3 {
+		t.Errorf("the length of event table should be 3, but got %d", len(*s.EventTable))
 	}
 }
 
@@ -76,8 +76,8 @@ func TestSortEventTable(t *testing.T) {
 
 	finishEvent := (*s.EventTable)[len(*s.EventTable)-1]
 
-	if finishEvent.Type != "finish" {
-		t.Errorf("the event type should be finish, but got %s", finishEvent.Type)
+	if finishEvent.Type != "eventFinish" {
+		t.Errorf("the event type should be eventFinish, but got %s", finishEvent.Type)
 	}
 
 	if finishEvent.Time != finishTime.UnixMicro() {

@@ -35,9 +35,12 @@ func NewSystem(packetRate float64, serviceRate float64, systemCapacity int64, st
 
 func (s System) Init() {
 	*s.EventTable = append(*s.EventTable, Event{
-		Type: "finish",
+		Type: "eventFinish",
 		Time: s.FinishTime,
 	})
+
+	s.AppendEvent("finish")
+	s.AppendEvent("start")
 }
 
 func (s System) AppendEvent(eventType string) {
@@ -63,6 +66,7 @@ func (s System) MoveToNextEvent() error {
 		return fmt.Errorf("event table is empty")
 	}
 
+	*s.NowEvent = (*s.EventTable)[0]
 	*s.EventTable = (*s.EventTable)[1:]
 
 	return nil
