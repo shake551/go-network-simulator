@@ -62,7 +62,7 @@ func (s System) SortEventTableByTime() {
 func (s System) MoveToNextEvent() error {
 	s.SortEventTableByTime()
 
-	if s.EventTable == &[]Event{} {
+	if len(*s.EventTable) == 0 {
 		return fmt.Errorf("event table is empty")
 	}
 
