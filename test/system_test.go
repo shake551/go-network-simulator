@@ -158,3 +158,30 @@ func TestEventStart(t *testing.T) {
 		t.Errorf("the length of event queue should be 1, but got %d", len((*s.EventQueue).Data))
 	}
 }
+
+func TestEventFinish(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	s.Init()
+
+	for (*s.NowEvent).Type != "finish" {
+		s.SortEventTableByTime()
+		s.EventStart()
+		err := s.MoveToNextEvent()
+		if err != nil {
+			t.Errorf("cannot move to next event")
+		}
+	}
+
+	s.SortEventTableByTime()
+	if (*s.NowEvent).Type != "finish" {
+		t.Errorf("nowEvent type should be finish, but got %s", (*s.NowEvent).Type)
+	}
+	s.EventFinish()
+
+	if !*s.IsProcess {
+		t.Errorf("the simulator should be processing")
+	}
+}
