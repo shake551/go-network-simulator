@@ -34,12 +34,12 @@ func TestInit(t *testing.T) {
 		t.Errorf("the finish time should be %d, but got %d", finishTime.UnixMicro(), s.FinishTime)
 	}
 
-	if s.NowTime != nowTime.UnixMicro() {
-		t.Errorf("the nowTime should be %d, but got %d", nowTime.UnixMicro(), s.NowTime)
+	if s.NowEvent.Time != nowTime.UnixMicro() {
+		t.Errorf("the nowEventTime should be %d, but got %d", nowTime.UnixMicro(), s.NowEvent.Time)
 	}
 
-	if len(*s.EventTable) != 2 {
-		t.Errorf("the length of event table should be 2, but got %d", len(*s.EventTable))
+	if len(*s.EventTable) != 1 {
+		t.Errorf("the length of event table should be 1, but got %d", len(*s.EventTable))
 	}
 }
 
@@ -59,7 +59,7 @@ func TestAppendEvent(t *testing.T) {
 		t.Errorf("the event type shold be start, but got %s", targetEvent.Type)
 	}
 
-	if targetEvent.Time <= s.NowTime {
+	if targetEvent.Time <= s.NowEvent.Time {
 		t.Errorf("the event time should be bigger than nowTime")
 	}
 }
