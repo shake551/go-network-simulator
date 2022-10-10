@@ -3,7 +3,6 @@ package simulator
 import "fmt"
 
 type Event struct {
-	ID   int
 	Type string
 	Time int64
 }

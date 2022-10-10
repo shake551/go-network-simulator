@@ -15,7 +15,7 @@ func TestQueue(t *testing.T) {
 	}
 
 	for i := 0; i < 5; i++ {
-		e := simulator.Event{ID: i, Type: "start", Time: time.Now().Unix()}
+		e := simulator.Event{Type: "start", Time: time.Now().UnixMicro()}
 		q.Enqueue(e)
 	}
 
@@ -24,8 +24,8 @@ func TestQueue(t *testing.T) {
 	}
 
 	e := q.Dequeue()
-	if e.ID != 0 {
-		t.Errorf("the dequeue ID should be 0, but got %d", e.ID)
+	if e.Type != "start" {
+		t.Errorf("the dequeue Type should be start, but got %s", e.Type)
 	}
 
 	if len(q.Data) != 4 {
