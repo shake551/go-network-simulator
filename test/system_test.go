@@ -1,0 +1,187 @@
+package test
+
+import (
+	"github.com/shake551/go-network-simulator/simulator"
+	"testing"
+	"time"
+)
+
+func TestInit(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+
+	s.Init()
+
+	if s.PacketRate != 0.5 {
+		t.Errorf("the packetRate should be 0.5, but got %f", s.PacketRate)
+	}
+
+	if s.SystemCapacity != 1000 {
+		t.Errorf("the system capacity should be 1000, but got %d", s.SystemCapacity)
+	}
+
+	if s.ServiceRate != 0.6 {
+		t.Errorf("the serviceRate should be 0.6, but got %f", s.ServiceRate)
+	}
+
+	if s.StartTime != nowTime.UnixMicro() {
+		t.Errorf("the start time should be %d, but got %d", nowTime.UnixMicro(), s.StartTime)
+	}
+
+	if s.FinishTime != finishTime.UnixMicro() {
+		t.Errorf("the finish time should be %d, but got %d", finishTime.UnixMicro(), s.FinishTime)
+	}
+
+	if s.NowEvent.Time != nowTime.UnixMicro() {
+		t.Errorf("the nowEventTime should be %d, but got %d", nowTime.UnixMicro(), s.NowEvent.Time)
+	}
+
+	if len(*s.EventTable) != 3 {
+		t.Errorf("the length of event table should be 3, but got %d", len(*s.EventTable))
+	}
+}
+
+func TestAppendEvent(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+
+	s.Init()
+
+	s.AppendEvent("start")
+
+	targetEvent := (*s.EventTable)[len(*s.EventTable)-1]
+
+	if targetEvent.Type != "start" {
+		t.Errorf("the event type shold be start, but got %s", targetEvent.Type)
+	}
+
+	if targetEvent.Time <= s.NowEvent.Time {
+		t.Errorf("the event time should be bigger than nowTime")
+	}
+}
+
+func TestSortEventTable(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+
+	s.Init()
+	s.AppendEvent("start")
+	s.SortEventTableByTime()
+
+	finishEvent := (*s.EventTable)[len(*s.EventTable)-1]
+
+	if finishEvent.Type != "eventFinish" {
+		t.Errorf("the event type should be eventFinish, but got %s", finishEvent.Type)
+	}
+
+	if finishEvent.Time != finishTime.UnixMicro() {
+		t.Errorf("the finish time should be %d, but got %d", finishEvent.Time, finishTime.UnixMicro())
+	}
+}
+
+func TestIsProcess(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	s.Init()
+	if !*s.IsProcess {
+		t.Errorf("the isProcess should be true, but got false")
+	}
+
+	s.UnProcess()
+	if *s.IsProcess {
+		t.Errorf("the isProcess should be false, but got true")
+	}
+
+	s.MakeProcess()
+	if !*s.IsProcess {
+		t.Errorf("the isProcess should be true, but got false")
+	}
+}
+
+func TestMoveToNextEvent(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	s.Init()
+
+	err := s.MoveToNextEvent()
+	if err != nil {
+		t.Errorf("cannot move to next event")
+	}
+
+	if (*s.NowEvent).Time == nowTime.UnixMicro() {
+		t.Errorf("nowEventTime should be more than %d, but got %d", (*s.NowEvent).Time, nowTime.UnixMicro())
+	}
+
+	if (*s.NowEvent).Type == (*s.EventTable)[0].Type {
+		t.Errorf("the NowEvent type should be different from next event type, but got %s = %s", (*s.NowEvent).Type, (*s.EventTable)[0].Type)
+	}
+
+	*s.EventTable = []simulator.Event{}
+
+	err = s.MoveToNextEvent()
+	if err == nil {
+		t.Errorf("the function MoveToNextEvent should return error, but got nil")
+	}
+}
+
+func TestEventStart(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	s.Init()
+	s.EventStart()
+
+	if len((*s.EventQueue).Data) != 1 {
+		t.Errorf("the length of event queue should be 1, but got %d", len((*s.EventQueue).Data))
+	}
+
+	*s.IsProcess = false
+	s.EventStart()
+
+	if !*s.IsProcess {
+		t.Errorf("the simulator should be pricessing, but not")
+	}
+
+	// testing do not update event queue
+	if len((*s.EventQueue).Data) != 1 {
+		t.Errorf("the length of event queue should be 1, but got %d", len((*s.EventQueue).Data))
+	}
+}
+
+func TestEventFinish(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	s.Init()
+
+	for (*s.NowEvent).Type != "finish" {
+		s.SortEventTableByTime()
+		s.EventStart()
+		err := s.MoveToNextEvent()
+		if err != nil {
+			t.Errorf("cannot move to next event")
+		}
+	}
+
+	s.SortEventTableByTime()
+	if (*s.NowEvent).Type != "finish" {
+		t.Errorf("nowEvent type should be finish, but got %s", (*s.NowEvent).Type)
+	}
+	s.EventFinish()
+
+	if !*s.IsProcess {
+		t.Errorf("the simulator should be processing")
+	}
+}
