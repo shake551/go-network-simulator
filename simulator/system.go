@@ -44,6 +44,28 @@ func (s System) Init() {
 	s.MakeProcess()
 }
 
+func (s System) Simulate() (bool, error) {
+	err := s.MoveToNextEvent()
+	if err != nil {
+		return false, err
+	}
+
+	fmt.Printf("simulate %d, %s\n", (*s.NowEvent).Time, (*s.NowEvent).Type)
+
+	switch (*s.NowEvent).Type {
+	case "start":
+		s.EventStart()
+	case "finish":
+		s.EventFinish()
+	case "eventFinish":
+		return false, nil
+	default:
+		return false, fmt.Errorf("unexpected input: %s", (*s.NowEvent).Type)
+	}
+
+	return true, nil
+}
+
 func (s System) AppendEvent(eventType string) {
 	nowTime := time.UnixMicro(s.NowEvent.Time)
 	durationMillisecond := time.Duration(s.GetPacketTime())
