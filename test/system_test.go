@@ -91,11 +91,6 @@ func TestIsProcess(t *testing.T) {
 
 	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
 	s.Init()
-	if *s.IsProcess {
-		t.Errorf("the isProcess should be false, but got true")
-	}
-
-	s.MakeProcess()
 	if !*s.IsProcess {
 		t.Errorf("the isProcess should be true, but got false")
 	}
@@ -103,6 +98,11 @@ func TestIsProcess(t *testing.T) {
 	s.UnProcess()
 	if *s.IsProcess {
 		t.Errorf("the isProcess should be false, but got true")
+	}
+
+	s.MakeProcess()
+	if !*s.IsProcess {
+		t.Errorf("the isProcess should be true, but got false")
 	}
 }
 
@@ -131,5 +131,30 @@ func TestMoveToNextEvent(t *testing.T) {
 	err = s.MoveToNextEvent()
 	if err == nil {
 		t.Errorf("the function MoveToNextEvent should return error, but got nil")
+	}
+}
+
+func TestEventStart(t *testing.T) {
+	nowTime := time.Now()
+	finishTime := nowTime.Add(time.Minute * 5)
+
+	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	s.Init()
+	s.EventStart()
+
+	if len((*s.EventQueue).Data) != 1 {
+		t.Errorf("the length of event queue should be 1, but got %d", len((*s.EventQueue).Data))
+	}
+
+	*s.IsProcess = false
+	s.EventStart()
+
+	if !*s.IsProcess {
+		t.Errorf("the simulator should be pricessing, but not")
+	}
+
+	// testing do not update event queue
+	if len((*s.EventQueue).Data) != 1 {
+		t.Errorf("the length of event queue should be 1, but got %d", len((*s.EventQueue).Data))
 	}
 }
