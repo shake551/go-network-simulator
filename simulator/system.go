@@ -86,6 +86,17 @@ func (s System) EventStart() {
 	}
 }
 
+func (s System) EventFinish() {
+	queueEvent := (*s.EventQueue).Dequeue()
+	if queueEvent.Type == "" {
+		fmt.Println("there is no queued event")
+		return
+	}
+
+	s.AppendEvent("finish")
+	s.MakeProcess()
+}
+
 func (s System) GetPacketTime() int {
 	return RandomMillisecond(s.PacketRate)
 }
