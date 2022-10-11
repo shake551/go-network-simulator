@@ -4,29 +4,28 @@ import (
 	"fmt"
 	"github.com/shake551/go-network-simulator/utils"
 	"sort"
-	"time"
 )
 
 type System struct {
 	PacketRate     float64
 	ServiceRate    float64
 	SystemCapacity int64
-	StartTime      int64
-	FinishTime     int64
+	StartTime      float64
+	FinishTime     float64
 	NowEvent       *Event
 	EventTable     *[]Event
 	EventQueue     *EventQueue
 	IsProcess      *bool
 }
 
-func NewSystem(packetRate float64, serviceRate float64, systemCapacity int64, startTime time.Time, finishTime time.Time, maxSize int) *System {
+func NewSystem(packetRate float64, serviceRate float64, systemCapacity int64, startTime float64, finishTime float64, maxSize int) *System {
 	return &System{
 		PacketRate:     packetRate,
 		ServiceRate:    serviceRate,
 		SystemCapacity: systemCapacity,
-		StartTime:      startTime.UnixMicro(),
-		FinishTime:     finishTime.UnixMicro(),
-		NowEvent:       &Event{Type: "start", Time: startTime.UnixMicro()},
+		StartTime:      startTime,
+		FinishTime:     finishTime,
+		NowEvent:       &Event{Type: "start", Time: startTime},
 		EventTable:     &[]Event{},
 		EventQueue:     &EventQueue{MaxSize: maxSize},
 		IsProcess:      utils.Bool(false),
@@ -50,7 +49,7 @@ func (s System) Simulate() (bool, error) {
 		return false, err
 	}
 
-	fmt.Printf("simulate %d, %s\n", (*s.NowEvent).Time, (*s.NowEvent).Type)
+	fmt.Printf("simulate %f, %s\n", (*s.NowEvent).Time, (*s.NowEvent).Type)
 
 	switch (*s.NowEvent).Type {
 	case "start":
@@ -67,14 +66,11 @@ func (s System) Simulate() (bool, error) {
 }
 
 func (s System) AppendEvent(eventType string) {
-	nowTime := time.UnixMicro(s.NowEvent.Time)
-	durationMillisecond := time.Duration(s.GetPacketTime())
-
-	eventTime := nowTime.Add(time.Millisecond * durationMillisecond)
+	eventTime := s.NowEvent.Time + s.GetPacketTime()
 
 	*s.EventTable = append(*s.EventTable, Event{
 		Type: eventType,
-		Time: eventTime.UnixMicro(),
+		Time: eventTime,
 	})
 }
 
@@ -119,11 +115,11 @@ func (s System) EventFinish() {
 	s.MakeProcess()
 }
 
-func (s System) GetPacketTime() int {
+func (s System) GetPacketTime() float64 {
 	return RandomMillisecond(s.PacketRate)
 }
 
-func (s System) GetServiceTime() int {
+func (s System) GetServiceTime() float64 {
 	return RandomMillisecond(s.ServiceRate)
 }
 

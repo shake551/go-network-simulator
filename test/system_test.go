@@ -3,14 +3,12 @@ package test
 import (
 	"github.com/shake551/go-network-simulator/simulator"
 	"testing"
-	"time"
 )
 
 func TestInit(t *testing.T) {
-	nowTime := time.Now()
-	finishTime := nowTime.Add(time.Minute * 5)
-
-	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	startTime := 0.0
+	finishTime := 10.0
+	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
 
 	s.Init()
 
@@ -26,16 +24,16 @@ func TestInit(t *testing.T) {
 		t.Errorf("the serviceRate should be 0.6, but got %f", s.ServiceRate)
 	}
 
-	if s.StartTime != nowTime.UnixMicro() {
-		t.Errorf("the start time should be %d, but got %d", nowTime.UnixMicro(), s.StartTime)
+	if s.StartTime != startTime {
+		t.Errorf("the start time should be %f, but got %f", startTime, s.StartTime)
 	}
 
-	if s.FinishTime != finishTime.UnixMicro() {
-		t.Errorf("the finish time should be %d, but got %d", finishTime.UnixMicro(), s.FinishTime)
+	if s.FinishTime != finishTime {
+		t.Errorf("the finish time should be %f, but got %f", finishTime, s.FinishTime)
 	}
 
-	if s.NowEvent.Time != nowTime.UnixMicro() {
-		t.Errorf("the nowEventTime should be %d, but got %d", nowTime.UnixMicro(), s.NowEvent.Time)
+	if s.NowEvent.Time != startTime {
+		t.Errorf("the nowEventTime should be %f, but got %f", startTime, s.NowEvent.Time)
 	}
 
 	if len(*s.EventTable) != 3 {
@@ -44,10 +42,9 @@ func TestInit(t *testing.T) {
 }
 
 func TestAppendEvent(t *testing.T) {
-	nowTime := time.Now()
-	finishTime := nowTime.Add(time.Minute * 5)
-
-	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	startTime := 0.0
+	finishTime := 10.0
+	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
 
 	s.Init()
 
@@ -65,10 +62,9 @@ func TestAppendEvent(t *testing.T) {
 }
 
 func TestSortEventTable(t *testing.T) {
-	nowTime := time.Now()
-	finishTime := nowTime.Add(time.Minute * 5)
-
-	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
+	startTime := 0.0
+	finishTime := 10.0
+	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
 
 	s.Init()
 	s.AppendEvent("start")
@@ -80,16 +76,16 @@ func TestSortEventTable(t *testing.T) {
 		t.Errorf("the event type should be eventFinish, but got %s", finishEvent.Type)
 	}
 
-	if finishEvent.Time != finishTime.UnixMicro() {
-		t.Errorf("the finish time should be %d, but got %d", finishEvent.Time, finishTime.UnixMicro())
+	if finishEvent.Time != finishTime {
+		t.Errorf("the finish time should be %f, but got %f", finishEvent.Time, finishTime)
 	}
 }
 
 func TestIsProcess(t *testing.T) {
-	nowTime := time.Now()
-	finishTime := nowTime.Add(time.Minute * 5)
+	startTime := 0.0
+	finishTime := 10.0
+	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
 
-	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
 	s.Init()
 	if !*s.IsProcess {
 		t.Errorf("the isProcess should be true, but got false")
@@ -107,10 +103,10 @@ func TestIsProcess(t *testing.T) {
 }
 
 func TestMoveToNextEvent(t *testing.T) {
-	nowTime := time.Now()
-	finishTime := nowTime.Add(time.Minute * 5)
+	startTime := 0.0
+	finishTime := 10.0
+	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
 
-	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
 	s.Init()
 
 	err := s.MoveToNextEvent()
@@ -118,8 +114,8 @@ func TestMoveToNextEvent(t *testing.T) {
 		t.Errorf("cannot move to next event")
 	}
 
-	if (*s.NowEvent).Time == nowTime.UnixMicro() {
-		t.Errorf("nowEventTime should be more than %d, but got %d", (*s.NowEvent).Time, nowTime.UnixMicro())
+	if (*s.NowEvent).Time == startTime {
+		t.Errorf("nowEventTime should be more than %f, but got %f", (*s.NowEvent).Time, startTime)
 	}
 
 	if (*s.NowEvent).Type == (*s.EventTable)[0].Type {
@@ -135,10 +131,10 @@ func TestMoveToNextEvent(t *testing.T) {
 }
 
 func TestEventStart(t *testing.T) {
-	nowTime := time.Now()
-	finishTime := nowTime.Add(time.Minute * 5)
+	startTime := 0.0
+	finishTime := 10.0
+	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
 
-	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
 	s.Init()
 	s.EventStart()
 
@@ -160,10 +156,10 @@ func TestEventStart(t *testing.T) {
 }
 
 func TestEventFinish(t *testing.T) {
-	nowTime := time.Now()
-	finishTime := nowTime.Add(time.Minute * 5)
+	startTime := 0.0
+	finishTime := 10.0
+	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
 
-	s := simulator.NewSystem(0.5, 0.6, 1000, nowTime, finishTime, 1000)
 	s.Init()
 
 	for (*s.NowEvent).Type != "finish" {
