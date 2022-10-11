@@ -1,10 +1,8 @@
 package test
 
 import (
-	"testing"
-	"time"
-
 	"github.com/shake551/go-network-simulator/simulator"
+	"testing"
 )
 
 func TestQueue(t *testing.T) {
@@ -15,7 +13,7 @@ func TestQueue(t *testing.T) {
 	}
 
 	for i := 0; i < 5; i++ {
-		e := simulator.Event{Type: "start", Time: time.Now().UnixMicro()}
+		e := simulator.Event{Type: "start", Time: float64(i)}
 		q.Enqueue(e)
 	}
 

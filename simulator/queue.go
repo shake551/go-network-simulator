@@ -4,7 +4,7 @@ import "fmt"
 
 type Event struct {
 	Type string
-	Time int64
+	Time float64
 }
 
 type EventQueue struct {
