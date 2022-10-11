@@ -8,7 +8,7 @@ import (
 func main() {
 	startTime := 0.0
 	finishTime := 100.0
-	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
+	s := simulator.NewSystem(1, 0.1, startTime, finishTime, 10)
 	s.Init()
 
 	for true {
@@ -19,6 +19,9 @@ func main() {
 
 		if !keep {
 			fmt.Println("finish time")
+
+			packetStayTime := (*s.PacketStatistics).GetAverageOfPacketStayTime(s.FinishTime - s.StartTime)
+			fmt.Printf("average of packet stay time: %f, packet loss rate: %f", packetStayTime, (*s.PacketStatistics).GetPacketLossRate())
 			return
 		}
 	}

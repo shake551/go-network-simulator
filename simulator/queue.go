@@ -3,8 +3,9 @@ package simulator
 import "fmt"
 
 type Event struct {
-	Type string
-	Time float64
+	Type          string
+	Time          float64
+	InServiceTime float64 // optional: when event type is finish, this field needed
 }
 
 type EventQueue struct {
@@ -17,16 +18,17 @@ func (q *EventQueue) IsEmpty() bool {
 }
 
 func (q *EventQueue) IsFull() bool {
-	return len(q.Data) == q.MaxSize
+	return len(q.Data) >= q.MaxSize
 }
 
-func (q *EventQueue) Enqueue(e Event) {
+func (q *EventQueue) Enqueue(e Event) error {
 	if q.IsFull() {
 		fmt.Println("queue is full")
-		return
+		return fmt.Errorf("queue is full")
 	}
 
 	q.Data = append(q.Data, e)
+	return nil
 }
 
 func (q *EventQueue) Dequeue() Event {
