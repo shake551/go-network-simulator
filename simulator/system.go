@@ -146,3 +146,9 @@ func (s System) MakeProcess() {
 func (s System) UnProcess() {
 	*s.IsProcess = false
 }
+
+func (s System) AddStayTimeOfEventsInQueue() {
+	for _, event := range s.EventQueue.Data {
+		(*s.PacketStatistics).TotalStayTime += s.FinishTime - event.InServiceTime
+	}
+}
