@@ -8,16 +8,12 @@ import (
 func TestInit(t *testing.T) {
 	startTime := 0.0
 	finishTime := 10.0
-	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
+	s := simulator.NewSystem(0.5, 0.6, startTime, finishTime, 1000)
 
 	s.Init()
 
 	if s.PacketRate != 0.5 {
 		t.Errorf("the packetRate should be 0.5, but got %f", s.PacketRate)
-	}
-
-	if s.SystemCapacity != 1000 {
-		t.Errorf("the system capacity should be 1000, but got %d", s.SystemCapacity)
 	}
 
 	if s.ServiceRate != 0.6 {
@@ -44,11 +40,11 @@ func TestInit(t *testing.T) {
 func TestAppendEvent(t *testing.T) {
 	startTime := 0.0
 	finishTime := 10.0
-	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
+	s := simulator.NewSystem(0.5, 0.6, startTime, finishTime, 1000)
 
 	s.Init()
 
-	s.AppendEvent("start")
+	s.AppendStartEvent()
 
 	targetEvent := (*s.EventTable)[len(*s.EventTable)-1]
 
@@ -64,10 +60,10 @@ func TestAppendEvent(t *testing.T) {
 func TestSortEventTable(t *testing.T) {
 	startTime := 0.0
 	finishTime := 10.0
-	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
+	s := simulator.NewSystem(0.5, 0.6, startTime, finishTime, 1000)
 
 	s.Init()
-	s.AppendEvent("start")
+	s.AppendStartEvent()
 	s.SortEventTableByTime()
 
 	finishEvent := (*s.EventTable)[len(*s.EventTable)-1]
@@ -84,7 +80,7 @@ func TestSortEventTable(t *testing.T) {
 func TestIsProcess(t *testing.T) {
 	startTime := 0.0
 	finishTime := 10.0
-	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
+	s := simulator.NewSystem(0.5, 0.6, startTime, finishTime, 1000)
 
 	s.Init()
 	if !*s.IsProcess {
@@ -105,7 +101,7 @@ func TestIsProcess(t *testing.T) {
 func TestMoveToNextEvent(t *testing.T) {
 	startTime := 0.0
 	finishTime := 10.0
-	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
+	s := simulator.NewSystem(0.5, 0.6, startTime, finishTime, 1000)
 
 	s.Init()
 
@@ -133,7 +129,7 @@ func TestMoveToNextEvent(t *testing.T) {
 func TestEventStart(t *testing.T) {
 	startTime := 0.0
 	finishTime := 10.0
-	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
+	s := simulator.NewSystem(0.5, 0.6, startTime, finishTime, 1000)
 
 	s.Init()
 	s.EventStart()
@@ -158,7 +154,7 @@ func TestEventStart(t *testing.T) {
 func TestEventFinish(t *testing.T) {
 	startTime := 0.0
 	finishTime := 10.0
-	s := simulator.NewSystem(0.5, 0.6, 1000, startTime, finishTime, 1000)
+	s := simulator.NewSystem(0.5, 0.6, startTime, finishTime, 1000)
 
 	s.Init()
 
