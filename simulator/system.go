@@ -26,7 +26,7 @@ func NewSystem(packetRate float64, serviceRate float64, startTime float64, finis
 		FinishTime:       finishTime,
 		NowEvent:         &Event{Type: "start", Time: startTime},
 		EventTable:       &[]Event{},
-		EventQueue:       &EventQueue{MaxSize: maxSize},
+		EventQueue:       &EventQueue{MaxSize: maxSize - 1},
 		IsProcess:        utils.Bool(false),
 		PacketStatistics: &PacketStatistics{TotalCount: 0, PacketLoss: 0, TotalStayTime: 0},
 	}
@@ -127,7 +127,6 @@ func (s System) EventFinish() {
 		return
 	}
 
-	s.AppendFinishEvent()
 	s.MakeProcess()
 }
 
