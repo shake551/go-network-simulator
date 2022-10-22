@@ -7,7 +7,7 @@ type PacketStatistics struct {
 }
 
 func (p PacketStatistics) GetPacketLossRate() float64 {
-	return (float64(p.PacketLoss) / float64(p.TotalCount)) * 100
+	return float64(p.PacketLoss) / float64(p.TotalCount)
 }
 
 func (p PacketStatistics) GetAverageOfPacketCount(totalTime float64) float64 {
