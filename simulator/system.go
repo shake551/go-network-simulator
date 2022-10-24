@@ -3,6 +3,7 @@ package simulator
 import (
 	"fmt"
 	"github.com/shake551/go-network-simulator/utils"
+	"math"
 	"sort"
 )
 
@@ -11,6 +12,7 @@ type System struct {
 	ServiceRate      float64
 	StartTime        float64
 	FinishTime       float64
+	maxSize          float64
 	NowEvent         *Event
 	EventTable       *[]Event
 	EventQueue       *EventQueue
@@ -24,6 +26,7 @@ func NewSystem(packetRate float64, serviceRate float64, startTime float64, finis
 		ServiceRate:      serviceRate,
 		StartTime:        startTime,
 		FinishTime:       finishTime,
+		maxSize:          float64(maxSize),
 		NowEvent:         &Event{Type: "start", Time: startTime},
 		EventTable:       &[]Event{},
 		EventQueue:       &EventQueue{MaxSize: maxSize - 1},
@@ -151,4 +154,36 @@ func (s System) AddStayTimeOfEventsInQueue() {
 	for _, event := range s.EventQueue.Data {
 		(*s.PacketStatistics).TotalStayTime += s.FinishTime - event.InServiceTime
 	}
+}
+
+func (s System) calcTheoreticalValueOfPacketCount() float64 {
+	return s.PacketRate/(1-s.PacketRate) -
+		(s.maxSize+1)*math.Pow(s.PacketRate, s.maxSize+1)/(1-math.Pow(s.PacketRate, s.maxSize+1))
+}
+
+func (s System) calcTheoreticalValueOfStayTime(packetCount float64, lossRate float64) float64 {
+	return packetCount / (s.PacketRate * (1 - lossRate))
+}
+
+func (s System) calcTheoreticalValueOfPacketLoss() float64 {
+	p0 := 0.0
+	if s.PacketRate == 1 {
+		p0 = 1 / (1 + s.maxSize)
+	} else {
+		p0 = (1 - s.PacketRate) / (1 - math.Pow(s.PacketRate, s.maxSize+1))
+	}
+
+	return math.Pow(s.PacketRate, s.maxSize) * p0
+}
+
+func (s System) ShowTheoreticalValues() {
+	packetCount := s.calcTheoreticalValueOfPacketCount()
+	packetLoss := s.calcTheoreticalValueOfPacketLoss()
+	stayTime := s.calcTheoreticalValueOfStayTime(packetCount, packetLoss)
+
+	fmt.Println("-------------- show theoretical values ----------------")
+	fmt.Printf("average of packet count: %f\n", packetCount)
+	fmt.Printf("average of stay time: %f\n", stayTime)
+	fmt.Printf("average of packet loss rate: %f\n", packetLoss)
+
 }
