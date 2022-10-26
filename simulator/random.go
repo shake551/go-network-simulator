@@ -1,14 +1,17 @@
 package simulator
 
 import (
+	"crypto/rand"
 	"math"
-	"math/rand"
-	"time"
+	"math/big"
 )
 
 func RandomMillisecond(x float64) float64 {
-	rand.Seed(time.Now().UnixNano())
+	n, err := rand.Int(rand.Reader, big.NewInt(100))
+	if err != nil {
+		panic(err)
+	}
 
-	expRandom := math.Log(1-rand.Float64()) * -1 / x
+	expRandom := math.Log(1-float64(n.Int64())/100) * -1 / x
 	return expRandom
 }
