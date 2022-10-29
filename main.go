@@ -9,51 +9,52 @@ import (
 func exeSimulate(packetRate float64) {
 	startTime := 0.0
 	finishTime := 10000.0
-
-	totalPacketCount := 0.0
-	totalPacketStayTime := 0.0
-	totalPacketLossRate := 0.0
-
 	repeatCount := 1000
-
 	gs := utils.NewGSpread(packetRate)
+
 	for i := 0; i < repeatCount; i++ {
-		s := simulator.NewSystem(packetRate, 1, startTime, finishTime, 50)
-		s.Init()
 
-		for true {
-			keep, err := s.Simulate()
-			if err != nil {
-				fmt.Println(err)
-			}
+		totalPacketCount := 0.0
+		totalPacketStayTime := 0.0
+		totalPacketLossRate := 0.0
 
-			if !keep {
-				fmt.Println("finish time")
+		for i := 0; i < 10; i++ {
+			s := simulator.NewSystem(packetRate, 1, startTime, finishTime, 50)
+			s.Init()
 
-				s.AddStayTimeOfEventsInQueue()
+			for true {
+				keep, err := s.Simulate()
+				if err != nil {
+					fmt.Println(err)
+				}
 
-				packetCount := (*s.PacketStatistics).GetAverageOfPacketCount(s.FinishTime - s.StartTime)
-				stayTime := (*s.PacketStatistics).GetAverageOfPacketStayTime()
-				packetLossRate := (*s.PacketStatistics).GetPacketLossRate()
+				if !keep {
+					fmt.Println("finish time")
 
-				gs.AppendNewStatistics(packetCount, stayTime, packetLossRate)
+					s.AddStayTimeOfEventsInQueue()
 
-				totalPacketCount += packetCount
-				totalPacketStayTime += stayTime
-				totalPacketLossRate += packetLossRate
+					packetCount := (*s.PacketStatistics).GetAverageOfPacketCount(s.FinishTime - s.StartTime)
+					stayTime := (*s.PacketStatistics).GetAverageOfPacketStayTime()
+					packetLossRate := (*s.PacketStatistics).GetPacketLossRate()
 
-				s.ShowTheoreticalValues()
+					totalPacketCount += packetCount
+					totalPacketStayTime += stayTime
+					totalPacketLossRate += packetLossRate
 
-				break
+					s.ShowTheoreticalValues()
+
+					break
+				}
 			}
 		}
-	}
-	fmt.Println()
-	fmt.Printf("packetRate: %f\n", packetRate)
+		gs.AppendNewStatistics(totalPacketCount/10, totalPacketStayTime/10, totalPacketLossRate/10)
+		fmt.Println()
+		fmt.Printf("packetRate: %f\n", packetRate)
 
-	fmt.Println("-------------- show statistics ----------------")
-	fmt.Printf("average of packet conunt: %f\naverage of packet stay time: %f\npacket loss rate: %f\n",
-		totalPacketCount/float64(repeatCount), totalPacketStayTime/float64(repeatCount), totalPacketLossRate/float64(repeatCount))
+		fmt.Println("-------------- show statistics ----------------")
+		fmt.Printf("average of packet conunt: %f\naverage of packet stay time: %f\npacket loss rate: %f\n",
+			totalPacketCount/float64(repeatCount), totalPacketStayTime/float64(repeatCount), totalPacketLossRate/float64(repeatCount))
+	}
 	gs.Insert()
 }
 
