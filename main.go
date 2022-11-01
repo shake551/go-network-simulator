@@ -8,7 +8,7 @@ import (
 
 func exeSimulate(packetRate float64) {
 	startTime := 0.0
-	finishTime := 10000.0
+	finishTime := 100000.0
 
 	totalPacketCount := 0.0
 	totalPacketStayTime := 0.0

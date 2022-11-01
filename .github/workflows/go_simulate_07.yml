@@ -1,0 +1,18 @@
+name: Go
+on: []
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Simulate with param 0.7
+        run: go run exeSimulate(0.7) -v ./...

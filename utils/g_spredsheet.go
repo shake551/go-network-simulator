@@ -11,6 +11,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 )
 
 type GSpread struct {
@@ -85,7 +87,7 @@ func (g GSpread) CreateNewSheet(sheetName string) {
 	req := sheets.Request{
 		AddSheet: &sheets.AddSheetRequest{
 			Properties: &sheets.SheetProperties{
-				Title: sheetName,
+				Title: sheetName + strconv.FormatInt(time.Now().UnixNano(), 10),
 			},
 		},
 	}
