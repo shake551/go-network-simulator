@@ -8,7 +8,7 @@ import (
 
 func exeSimulate(packetRate float64) {
 	startTime := 0.0
-	finishTime := 10000.0
+	finishTime := 1000000.0
 	repeatCount := 1000
 	gs := utils.NewGSpread(packetRate)
 
