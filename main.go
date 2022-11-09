@@ -8,9 +8,8 @@ import (
 
 func exeSimulate(packetRate float64) {
 	startTime := 0.0
-	finishTime := 1000000.0
+	finishTime := 100000.0
 	repeatCount := 1000
-	gs := utils.NewGSpread(packetRate)
 
 	for i := 0; i < repeatCount; i++ {
 
@@ -47,15 +46,21 @@ func exeSimulate(packetRate float64) {
 				}
 			}
 		}
+		gs := utils.NewGSpread(packetRate)
+
 		gs.AppendNewStatistics(totalPacketCount/10, totalPacketStayTime/10, totalPacketLossRate/10)
+		gs.Insert()
 		fmt.Println()
 		fmt.Printf("packetRate: %f\n", packetRate)
 
 		fmt.Println("-------------- show statistics ----------------")
 		fmt.Printf("average of packet conunt: %f\naverage of packet stay time: %f\npacket loss rate: %f\n",
 			totalPacketCount/float64(repeatCount), totalPacketStayTime/float64(repeatCount), totalPacketLossRate/float64(repeatCount))
+
+		if len(*gs.Result) > repeatCount {
+			break
+		}
 	}
-	gs.Insert()
 }
 
 func main() {
